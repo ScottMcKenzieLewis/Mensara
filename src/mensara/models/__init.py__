@@ -1,0 +1,10 @@
+"""Package marker for models.
+
+This file makes the `models` directory a Python package so
+that tests in this folder can be imported by test runners or helpers.
+It is intentionally minimal — keep any test utilities in a separate
+module (e.g. `tests/models/test.py`) and import them explicitly
+from tests.
+"""
+
+__all__ = []

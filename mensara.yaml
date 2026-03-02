@@ -1,0 +1,14 @@
+materials:
+  default_material: cast_iron
+  material_specs:
+    cast_iron:
+      density_lb_in3: 0.255
+
+pressure:
+  allowable_stress_psi: 20000
+  default_factor_of_safety: 2.0
+
+flow:
+  gallons_per_ft3: 7.48051948
+  seconds_per_minute: 60.0
+  default_velocity_ft_s: 5.0
