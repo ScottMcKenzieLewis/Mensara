@@ -1,4 +1,4 @@
-# mensara
+# Mensara
 
 Mensara is a lightweight engineering CLI for quick pipe calculations:
 
