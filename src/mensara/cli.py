@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typer
 
+from mensara.unit import from_us, to_us
 from mensara.config import UnitSystem, load_config
 from mensara.formulas.flow import flow_gpm
 from mensara.formulas.pressure import pressure_estimate_psi
@@ -21,6 +22,7 @@ M_PER_FT = 0.3048
 BAR_PER_PSI = 0.0689476
 M3HR_PER_GPM = 0.2271247
 UNITS_HELP = "Display units: us or metric."
+PRECISION_HELP = "Decimal places to display."
 
 
 def _print_header(title: str) -> None:
@@ -74,84 +76,6 @@ def _fmt_value(value_us: float, quantity: str, precision: int, units: str) -> st
 
     return f"{converted:.{precision}f} {suffix}"
 
-
-def _to_us(value: float, unit: str) -> float:
-    """
-    Convert a scalar from the given unit into Mensara's internal US units.
-
-    Supported:
-      - in, mm  -> inches
-      - ft, m   -> feet
-      - ft/s, m/s -> ft/s
-      - psi, bar -> psi
-      - gpm, m3/hr -> gpm
-    """
-    u = unit.strip().lower()
-
-    if u in {"in", "inch", "inches"}:
-        return value
-    if u == "mm":
-        return value / MM_PER_IN
-
-    if u in {"ft", "foot", "feet"}:
-        return value
-    if u == "m":
-        return value / M_PER_FT
-
-    if u in {"ft/s", "ftps"}:
-        return value
-    if u in {"m/s", "mps"}:
-        return value / M_PER_FT
-
-    if u == "psi":
-        return value
-    if u == "bar":
-        return value / BAR_PER_PSI
-
-    if u == "gpm":
-        return value
-    if u in {"m3/hr", "m^3/hr", "m3h"}:
-        return value / M3HR_PER_GPM
-
-    raise typer.BadParameter(
-        "Unsupported unit. Try: in, mm, ft, m, ft/s, m/s, psi, bar, gpm, m3/hr"
-    )
-
-
-def _from_us(value_us: float, unit: str) -> float:
-    """Convert a scalar from internal US units into the requested unit."""
-    u = unit.strip().lower()
-
-    if u in {"in", "inch", "inches"}:
-        return value_us
-    if u == "mm":
-        return value_us * MM_PER_IN
-
-    if u in {"ft", "foot", "feet"}:
-        return value_us
-    if u == "m":
-        return value_us * M_PER_FT
-
-    if u in {"ft/s", "ftps"}:
-        return value_us
-    if u in {"m/s", "mps"}:
-        return value_us * M_PER_FT
-
-    if u == "psi":
-        return value_us
-    if u == "bar":
-        return value_us * BAR_PER_PSI
-
-    if u == "gpm":
-        return value_us
-    if u in {"m3/hr", "m^3/hr", "m3h"}:
-        return value_us * M3HR_PER_GPM
-
-    raise typer.BadParameter(
-        "Unsupported unit. Try: in, mm, ft, m, ft/s, m/s, psi, bar, gpm, m3/hr"
-    )
-
-
 def _resolve_material_density(cfg, material: str | None, density_override: float | None) -> tuple[str, float, str]:
     """
     Resolve material/density for weight calculation.
@@ -194,11 +118,11 @@ def convert(
     to_unit: str = typer.Argument(
         ..., help="Unit to convert TO (e.g., in, mm, ft, m, ft/s, m/s, psi, bar, gpm, m3/hr)."
     ),
-    precision: int = typer.Option(4, "--precision", help="Decimal places to display."),
+    precision: int = typer.Option(4, "--precision", help=PRECISION_HELP),
 ) -> None:
     """Convert between supported US and metric units."""
-    value_us = _to_us(value, from_unit)
-    out = _from_us(value_us, to_unit)
+    value_us = to_us(value, from_unit)
+    out = from_us(value_us, to_unit)
 
     _print_header("Convert")
     print(f"Input  : {value:.{precision}f} {from_unit}")
@@ -223,7 +147,7 @@ def weight(
         help="Override density (lb/in^3). Otherwise material/config/default.",
     ),
     units: str = typer.Option(UnitSystem.US.value, "--units", help=UNITS_HELP),
-    precision: int = typer.Option(2, "--precision", help="Decimal places to display."),
+    precision: int = typer.Option(2, "--precision", help=PRECISION_HELP),
 ) -> None:
     """Compute pipe weight (lb) from geometry and length."""
     cfg = load_config()
@@ -253,7 +177,7 @@ def flow(
         None, "--velocity-ft-s", help="Fluid velocity (ft/s). Defaults from config if omitted."
     ),
     units: str = typer.Option(UnitSystem.US.value, "--units", help=UNITS_HELP),
-    precision: int = typer.Option(2, "--precision", help="Decimal places to display."),
+    precision: int = typer.Option(2, "--precision", help=PRECISION_HELP),
 ) -> None:
     """Compute flow rate (gallons per minute)."""
     cfg = load_config()
@@ -285,7 +209,7 @@ def pressure(
     ),
     fs: float | None = typer.Option(None, "--fs", help="Factor of safety (overrides config default)"),
     units: str = typer.Option(UnitSystem.US.value, "--units", help=UNITS_HELP),
-    precision: int = typer.Option(2, "--precision", help="Decimal places to display."),
+    precision: int = typer.Option(2, "--precision", help=PRECISION_HELP),
 ) -> None:
     """Estimate internal pressure capacity (psi) using a thin-wall approximation."""
     cfg = load_config()
@@ -308,4 +232,3 @@ def pressure(
     print()
     print("Note: Thin-wall approximation. Not a code rating.")
     print()
-    
