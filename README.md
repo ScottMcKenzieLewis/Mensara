@@ -14,6 +14,16 @@ It is built with Python and Typer, with values loaded from a local YAML config f
 - Python 3.14+
 - Poetry (recommended for local development)
 
+## Screenshots
+
+<img width="1104" height="276" alt="image" src="https://github.com/user-attachments/assets/8d601716-5e1d-4ba6-8142-44e7658d76a6" />
+
+<img width="775" height="292" alt="image" src="https://github.com/user-attachments/assets/325abc91-f3f7-4867-885e-5fcf552eb716" />
+
+<img width="780" height="199" alt="image" src="https://github.com/user-attachments/assets/e65cc45c-fdc8-447c-9dc1-5ca0f3465b21" />
+
+<img width="740" height="289" alt="image" src="https://github.com/user-attachments/assets/27658126-a20a-4dc6-a02a-c9a994f7bd9e" />
+
 ## Installation
 
 ### Using Poetry (recommended)
